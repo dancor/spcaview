@@ -1,0 +1,209 @@
+/************* Changelog spcaview *****************/
+06/11/2006:
+version 1.1.8
+	Add bridge pac7311 pac207 vc0321 vc0323
+06/11/2006:
+version 1.1.7
+	FIX broken s key feature !! Who know it was broken ??
+	FIX 160x120 jpeg decoder for 422 stream
+28/08/2006:
+version 1.1.6
+	Add Flicker filters 50Hz 60Hz No flickers Thanks Serge A. Suchkov
+10/12/2005:
+version 1.1.5rc2
+	Add ioctl to spcav4l.c spcav4l.h
+	implement callback to spcaserv and spcaview client
+	change key to
+	d quality up
+	f quality down
+	g framerate up
+	h framerate down
+	j autoexpo on/off
+10/12/2005:
+version 1.1.5rc1
+	Add ioctl private management to spcaview (spcaserv and spcacat is not
+	set ATM )
+	quality
+	autoexposure ON/off
+	frame time interval
+	Update Java Applet with a FIX from Andrea Partinico
+	Update java Applet feature contrast and brightness can be set with the
+	mouse now, Thanks to Andrea Partinico :)
+	 
+12/11/2005
+version 1.1.4
+	FIX -N parameters in spcacat 
+	Update the java Applet
+version 1.1.3
+	spca5xx now can use a two framebuffers update spcaview 
+	FIX problem with some camera the first frame is empty 
+07/10/2005:
+version 1.1.2
+	Add a command key c on the client side server should send a 100ms pulse
+	on pin 14
+01/10/2005:
+version 1.1.1
+	Fix problem when parport is claim by another program disable use parport
+24/09/2005:
+version 1.1.0rc2
+	Add "spcacat" tools take a picture in jpeg every x ms 
+		store in a date/hours/Picture forms or overwrite the picture
+		name
+	look at spcacat -h for more info
+	change makefile for spcacat
+	make install_spcacat build and install the binary no depencies
+23/09/2005:
+	version 1.1.0rc1
+	change makefile spcaserv can be compiled without libsdl with:
+	make install_spcaserv
+	Break server client compatibilty with previous version
+	use packed struct to solve x86/x86_64 problem
+	change the java Applet according the struct packed
+	
+18/09/2005:
+	version 1.0.9
+	FIX a bug in the bridge detection
+	Add a lot of missing new bridge
+14/06/2005:
+	version 1.0.8
+	Allow full screen in player mode 
+	Fix only q should quit in grabber mode
+	Add colors and exposure set get for the server messages
+02/06/2005:
+	version 1.0.7
+	FIX some parport bugs with x and y messages
+	FIX PPRELEASE on close
+01/06/2005:
+	version 1.0.6
+	use parallel port and a small hardware available soon with spcaserv
+	break the java applet sorry use the last revision or patch the applet:(
+	client can now goes sleep and should be wakeup on an event on the server
+	client can change brightness and contrast
+	client can drive xy tracking camera set on the server available soon :)
+05/05/2005:
+	version 1.0.5:
+	bugfix spca561 probe size
+	Improve client server protocol
+24/04/2005:
+	version 1.0.4
+	Add bridge Sonix sn9c102p jpeg without header
+19/04/2005:
+	version 1.0.3
+	Client now display date and hours from the server
+	Add a oneshoot feature with -N parameters -N can be combined with -p
+	for example:
+	spcaview -f jpg -s 320x240 -p 10 -N 2
+	start spcaview take a picture 10 second after start then another one at
+	20 seconds and exit 
+	if -p is not set default delay is set to 1 second
+	if -N is set to 0 :) then take one picture and exit 
+27/03/2005:
+	FIX bug segfault when the bridge are unknow
+	version 1.0.2
+26/03/2005:
+	FIX -b segfault thanks Jos van Wolput for the feedback and test
+	a lot of cleanup thanks Mark Studebaker	for the feedback and test
+25/03/2005:
+	Add the applet from Alvaro (nx5) :)
+	FIX palette rgb565 and rgb32 in the server
+	change version to 1.0.0
+18/03/2005:
+	FIX if client or server is down wait and shutdown the thread or the
+	server.		
+15/03/2005:
+	big rewrite start :)
+	Add resizer feature -m parameters can change aspect ratio :)
+	Picture always goes in jpeg form
+	record Picture as jpeg file or in an avi file 
+	Picture now have is own thread
+	split code player grabber server client
+	FIX player in frame by frame mode wait instead poll a lot of CPU cycle
+	saved :)
+	For embedded device spcaview now have is own jpeg decoder and jpeg
+	encoder (no more need jpeglib save 100ko memory space)
+	FIX from Tyler Montbriand SDL_audiolib did not block if the sound device
+	are opened in full duplex mode :)
+01/01/2005
+	Change UNIX itimer with signal used to SDL_timer 
+	picture get with -p is now set by date/times 	
+31/12/2004
+	Version is set to 0.4 major change
+	Add -j grab without SDL windows
+	Add SDL_audioin instead sndlib
+		SDL_audioin is compiled inside spcaview so no need of external dependancies
+		Rewrite the sound support works with low frame rate camera 5 fp/s and hight rate 30 fp/s	
+	Add -p options get picture every N seconds Thanks David Lecombier and Stas Bevc
+	Add -t Print statistic on the console
+21/12/2004
+	Add Conexant cx11646 bridge
+01/10/2004
+	Add alternate resolution for the zc30x chips (available only for rgb yuv
+	palette)
+	Change version number spcaview-01102004 become spcaview-20041001
+26/09/2004
+	Add support for the zc30x chips (jpeg 4.2.2)		
+01/09/2004
+	Add support for the spca536, Our Sonix and Zr364xx Camera driver
+	Make -f jpg work with true jpeg stream get from the kernel
+23/08/2004
+	Fix some problem with autoadjust the initial brightness is get from the cam now
+	Adjust MAXBRIGHT to 50000 to avoid saturation with some cam
+	restore the statitistic feature when autobrightness is not set
+	and autobrightness value when set
+17/08/2004
+	Add autobrightness feature from Gihan Marasingha
+	change version 0.29
+20/05/2004
+	Add probe function spca5xx camera report palette and size available
+	bridge and Camera name.	
+15/04/2004
+	Add -n norme parameters 0 ->PAL || 1 -> NTSC || 2 -> Secam
+	Add -c Channel [0..3] VideoComposite [6..9] S-Video
+	Change version 0.27
+13/03/2004
+	Clean up Statistic
+	Change version 0.26 
+26/02/2004
+	Add compressor for yuv420p stream "Differential Pixel Static Huffman" encoder decoder
+	option -z that allow compression without loss on yuv stream (~50% in size)
+21/01/2004
+	Add screenshot when the cam stream only press the "s" key when you have focus 
+	on the windows grabber.The Picture goes in your current directory.
+	Minor change in frame refresh
+31/12/2003
+	Add -v grab in raw mode use with -o rawfile.avi start of frame is 0x30 0x30 0x64 0x62 
+	follow with size 32 bits
+	and the raw frame to detect the end try to found 0x00000000 :)
+	I will try encode a Spcaheader soon in the module to get the real frame size 
+01/11/2003
+	Add -g put the grab method to read instead mmap
+30/10/2003
+	Add VIDEO_PALETTE_RGB565 in record and play mode
+	ask with -f r16 the fourcc used RGB2
+19/10/2003
+	Add pictures control with the player key s when the stream is stopped
+		in RAW JPEG make a jpg screenshoot
+		in YUV RGB  make a pnm screenshoot
+	Fix bug with sound in frame by frame mode down
+	Clean the Makefile
+	Add the readme.avilib 
+18/10/2003
+	Add 	-a for audio input 0 is no audio, 1 microphone, 2 mixer output
+		-f select the input format from the driver 	r24 RGB 24bits
+								r32 RGB 32bits
+								yuv YUV420P
+								jpg RAW JPEG
+24/08/2003
+	Add -d feature to ask another device /dev/videoX
+23/08/2003
+	Change Sample audio sample rate and audio buffer size
+	for cam with low frame rate (Aiptek mini PenCam 1.
+10/08/2003
+	Add -s feature for Aiptek PocketDVII test
+
+
+
+	
+
+
+

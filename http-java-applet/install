@@ -1,0 +1,16 @@
+To use the applet you can use this in a HTML document:
+copy the archive JWebcamPlayer.jar and control.jpg to your http root directory
+Then insert the following code in your html document index.html
+if the spcaserv run on the same linux box nothing to change in the following code:)
+
+<applet codebase="." archive="JWebcamPlayer.jar" code="JWebcamPlayer/JWebcamPlayer.class" name="JWebcamPlayer" ID="JWebcamPlayer" width="400" height="400" MAYSCRIPT>
+<param name="Color" value="#ffffff">
+<param name="Server" value="127.0.0.1">
+<param name="Port" value="7070">
+<PARAM NAME="scriptable" value="true">
+<PARAM NAME="mayscript" value="true">
+<strong>You need to download Java.<br>
+Click <a href="http://www.java.com/en/download/manual.jsp">here:
+http://www.java.com/en/download/manual.jsp</a></strong><br>
+</applet>
+ 
