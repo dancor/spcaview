@@ -58,12 +58,12 @@
 #define AUDIO_SAMPLES			512 // 1024
 #define AUDIO_FORMAT			AUDIO_S16
 #define AUDIOSIZE 2
-#define NUM_CHUNCK 64 // 256 a large ring buffer 
+#define NUM_CHUNCK 64 // 256 a large ring buffer
 #define MAXBUFFERSIZE (AUDIO_SAMPLES*AUDIOSIZE*NUM_CHUNCK)
 #define HELPBUFFERSIZE (AUDIO_SAMPLES*AUDIOSIZE)
 
 // INIT_BRIGHT is the initial brightness level
-// BRIGHTMEAN is the goal mean brightness for the 
+// BRIGHTMEAN is the goal mean brightness for the
 // auto adjustment.
 // SPRING_CONSTANT determines the restoring force
 // for the auto adjust
@@ -107,9 +107,9 @@ struct Rbuffer {
 	int ptread ;
 	int ptwrite;
 	};
-	
+
 Uint32 GetVideoBpp (void);
-	
+
 static Uint32 callback_timer (Uint32 interval)
 {
 	pictFlag = 1;
@@ -131,23 +131,23 @@ void callback_record(void *userdata, Uint8 *stream, int len)
  	}
  	mybuf->ptwrite = (mybuf->ptwrite +len) % MAXBUFFERSIZE;
  //fprintf(stderr,"callback_record(%p,%d,%d %d)\n",userdata,mybuf->ptwrite,part1,part2);
- 
+
 }
 void callback_play(void *userdata, Uint8 *stream, int len)
 {
 	struct Rbuffer *mybuf=(struct Rbuffer*) userdata;
-	
+
 	int ptwrite=mybuf->ptwrite ;
 	int ptread =mybuf->ptread;
-	
+
 	int part1 =0;
 	int part2 =0;
 	int delta =0;
 	delta = ptwrite-ptread;
-	
+
 		if(delta < 0){
 			if (((MAXBUFFERSIZE + delta) >= len)){
-				
+
 	 			part1=MAXBUFFERSIZE-ptread;
 				if (part1 >=len){
 				part1 = len;
@@ -155,14 +155,14 @@ void callback_play(void *userdata, Uint8 *stream, int len)
 				} else {
 	 			part2 = len-part1;
 				}
-				//fprintf(stderr,"callback_playT part1 %d part2 %d \n",part1,part2); 
+				//fprintf(stderr,"callback_playT part1 %d part2 %d \n",part1,part2);
 			 	 memcpy (mybuf->helpbuffer,mybuf->buffer+ptread,part1);
 				if (part2)
 			 	    memcpy (mybuf->helpbuffer+part1,mybuf->buffer,part2);
 			 	SDL_MixAudio(stream,mybuf->helpbuffer, len, SDL_MIX_MAXVOLUME);
 				mybuf->ptread = (mybuf->ptread +len) % MAXBUFFERSIZE;
- 				//fprintf(stderr,"callback_playT ptread %d ptwrite %d \n",ptread,ptwrite); 
-			 
+ 				//fprintf(stderr,"callback_playT ptread %d ptwrite %d \n",ptread,ptwrite);
+
 			 } else {
 			 	//fprintf(stderr,"Waiting for dataT to Play Ptread %dPtwrite %d !! \n",ptread,ptwrite);
 			}
@@ -176,18 +176,18 @@ void callback_play(void *userdata, Uint8 *stream, int len)
 	 			//fprintf(stderr,"Waiting for dataF to Play Ptread %d Ptwrite %d !! \n",ptread,ptwrite);
 			}
 		}
-	
-	
-	
- 	
+
+
+
+
 }
-	
+
 static int clip_to(int x, int low, int high);
 //void equalize (unsigned char *src, int width, int height, int format);
 static int adjust_bright( struct video_picture *videopict, int fd);
 
 static int get_pic_mean ( int width, int height, const unsigned char *buffer,
-			  int is_rgb,int startx, int starty, int endx, 
+			  int is_rgb,int startx, int starty, int endx,
 			  int endy );
 
 static int setVideoPict (struct video_picture *videopict, int fd);
@@ -197,7 +197,7 @@ static int isSpcaChip (const char *BridgeName);
 /* return Bridge otherwhise -1 */
 static int getStreamId (const char * BridgeName);
 /* return Stream_id otherwhise -1 */
-static int probeSize (const char *BridgeName, int *width, int *height); 
+static int probeSize (const char *BridgeName, int *width, int *height);
 /* return 1->ok otherwhise -1 */
 void
 resize (unsigned char *dst,unsigned char *src, int Wd,int Hd,int Ws,int Hs) ;
@@ -209,12 +209,12 @@ readFrame (avi_t *out_fd,long i,unsigned char **jpegData, int * jpegSize, struct
 static void
 refresh_screen (unsigned char *src, unsigned char *pict, int format, int width,
 		int height,int owidth ,int oheight, int size, int autobright);
-		
+
 int spcaClient (char *Ip, short port,int owidth, int oheight ,int statOn);
 int spcaPlay (char* inputfile, int width, int height);
 int spcaGrab (char *outputfile,char fourcc[4] , const char *videodevice, int image_width,int image_height, int format, int owidth, int oheight,
 	int grabMethod,int videoOn,int audioout,int videocomp,int autobright,int statOn,int decodeOn);
-	
+
 void *waitandshoot(void* ptr)
 { pictstruct *mypict = (pictstruct *) ptr;
 	int width = mypict->width;
@@ -243,7 +243,7 @@ while(1){
 
 }
     return NULL;
-	
+
 }
 void init_callbackmessage(struct client_t* callback)
 {    char key[4] ={'O','K','\0','\0'} ;
@@ -265,41 +265,41 @@ void init_callbackmessage(struct client_t* callback)
 	callback->updocolors = colors;
 	callback->sleepon=sleepon;
 	callback->updosize = size;
-	callback->fps = fps;	
+	callback->fps = fps;
 }
-/* callback spec 
+/* callback spec
 	updobright = 1 increase bright
 	updobright = 0 nothing todo
 	updobright = 2 decrease bright
 	same for all updocontrast updosize
 	sleepon =1 ask the server for no frame
-		on wakeup sleepon is cleared server will send frame 
+		on wakeup sleepon is cleared server will send frame
 		and client should display
 	sleepon =2 ask the server to send a 100ms pulse on pin 14
 		pin 14 is inverted always 1 pulse 0
 */
 void reset_callbackmessage(struct client_t* callback)
-{    	
+{
 	callback->updobright= 0;
 	callback->updocontrast= 0;
 	callback->updoexposure = 0;
 	callback->updocolors = 0;
 	callback->sleepon= 0;
 	callback->updosize = 0;
-	callback->fps = 0;	
-}	
+	callback->fps = 0;
+}
 int
 main (int argc, char *argv[])
 {
 	/* Timing value used for statistic */
-	
+
 	const char *videodevice = NULL;
 	/* default mmap */
 	int grabMethod = 1;
-	
+
 	int format = VIDEO_PALETTE_YUV420P;
 	/******** output screen pointer ***/
-	
+
 	int image_width = IMAGE_WIDTH;
 	int image_height = IMAGE_HEIGHT;
 	int owidth = 0;
@@ -309,7 +309,7 @@ main (int argc, char *argv[])
 	char *inputfile = NULL;
 	char *outputfile = NULL;
 	char fourcc[4] = "MJPG";
-	
+
 	char *sizestring = NULL;
 	int use_libjpeg = 1;
 	char *separateur;
@@ -329,16 +329,16 @@ main (int argc, char *argv[])
 	char *AdIpPort;
 	char AdIp[]= "000.000.000.000";
 	unsigned short ports = 0;
-	
+
 	/*********************************/
 	SPCASTATE funct;
-	
- 
+
+
 	/* init default bytes per pixels for VIDEO_PALETTE_RAW_JPEG 	*/
 	/* FIXME bpp is used as byte per pixel for the ouput screen	*/
 	/* we need also a bpp_in for the input stream as spcaview   	*/
 	/* can convert stream That will be a good idea to have 2 struct */
-	/* with all global data one for input the other for output      */ 
+	/* with all global data one for input the other for output      */
 	bpp = 3;
 	funct = GRABBER;
 	printf(" %s \n",version);
@@ -506,15 +506,15 @@ main (int argc, char *argv[])
 					owidth, oheight);
 			}
 		}
-		if (strcmp (argv[i], "-p") == 0) { 		  
-			if (argv[i + 1]) interval = 1000* (atoi(argv[i + 1])); // timer works on ms
+		if (strcmp (argv[i], "-p") == 0) {
+			if (argv[i + 1]) interval = atoi(argv[i + 1]);
  		  	else {
  		   	 	printf ("No parameter specified with -p, aborting.\n");
  		    		exit (1);
  		  	}
 
  		}
-		if (strcmp (argv[i], "-N") == 0) { 		  
+		if (strcmp (argv[i], "-N") == 0) {
 			if (argv[i + 1]){
 			 numshoot = (atoi(argv[i + 1])); // timer works on ms
 			 if (numshoot <= 0) numshoot = 1; // in case :)
@@ -543,7 +543,7 @@ main (int argc, char *argv[])
 			image_width = 640;
 			image_height = 480;
 		}
-		
+
 
 
 		if (strcmp (argv[i], "-h") == 0) {
@@ -563,8 +563,8 @@ main (int argc, char *argv[])
 			printf ("-f	video format  default yuv  others options are r16 r24 r32 yuv jpg \n");
 			printf ("-b     enable automatic brightness adjustment \n");
 			printf ("-t     print statistics \n");
-			printf ("-p  x  getPicture every x seconds \n");
-			printf ("-p x && -o getPicture every x seconds and record in outfile\n");
+			printf ("-p  x  getPicture every x msec \n");
+			printf ("-p x && -o getPicture every x msec and record in outfile\n");
 			printf ("-w 	Address:Port read from Address xxx.xxx.xxx.xxx:Port\n");
 			printf ("-N x	take a x pictures and exit if p is not set p = 1 second \n");
 			exit (0);
@@ -573,15 +573,15 @@ main (int argc, char *argv[])
 
 
 
-	
-	
-	
+
+
+
 switch (funct) {
 	case PLAYER:
 	 {
 		/* that is spcaview player */
-		spcaPlay (inputfile, owidth, oheight);	
-	} 
+		spcaPlay (inputfile, owidth, oheight);
+	}
 	break;
 	case GRABBER:
 	{
@@ -594,18 +594,18 @@ switch (funct) {
 	{
 		spcaClient(AdIp,ports,owidth,oheight, statOn);
 	}
-	
-	
-	
+
+
+
 }
 
 exit (0);
 }
 int readjpeg(int sock, unsigned char **buf,struct frame_t *headerframe,struct client_t *message,int statOn)
 {
- 	
+
 	int byteread,bytewrite;
-	
+
 	bytewrite = write_sock(sock,(unsigned char*)message,sizeof(struct client_t));
 	// is sleeping ?
 	if ((byteread= read_sock(sock,(unsigned char*)headerframe,sizeof(struct frame_t))) < 0){
@@ -639,7 +639,7 @@ void init_sdlall(void)
 		exit (-1);
 	}
 	videoOk =1;
-	atexit (SDL_Quit);	
+	atexit (SDL_Quit);
 }
 void init_sdlvideo(void)
 {	/* Initialize defaults, Video and Audio */
@@ -654,14 +654,14 @@ void close_sdlvideo(void)
 	videoOk = 0;
 }
 int spcaClient (char *Ip, short port,int owidth, int oheight, int statOn)
-{	
+{
 	struct frame_t *headerframe;
 	struct client_t *messcallback;
 	unsigned char *buf = NULL;
 	int width,height;
 	int jpegsize;
-	int sock_client;	
-	int run = 1; 
+	int sock_client;
+	int run = 1;
 	int quit =1;
 	int keypressed  =0;
 	int bpp = 3;
@@ -693,7 +693,7 @@ int spcaClient (char *Ip, short port,int owidth, int oheight, int statOn)
 	p=pscreen->pixels;
 	}
 	do{
-	
+
 	if((jpegsize = readjpeg(sock_client,&buf,headerframe,messcallback,statOn)) < 0){
 	 // printf(" No size !!! exit fatal \n");
 		goto error;
@@ -702,7 +702,7 @@ int spcaClient (char *Ip, short port,int owidth, int oheight, int statOn)
 	if(!jpegsize && videoOk)
 		close_sdlvideo();
 	if( !videoOk && jpegsize){
-		init_sdlvideo();		
+		init_sdlvideo();
 		pscreen = SDL_SetVideoMode (owidth, oheight, bpp * 8,
 					  SDL_DOUBLEBUF | SDL_SWSURFACE);
 		p=pscreen->pixels;
@@ -730,7 +730,7 @@ int spcaClient (char *Ip, short port,int owidth, int oheight, int statOn)
 							case SDLK_s:
 								//getPicture(buf,jpegsize);
 								getJpegPicture(buf,width,height,
-									VIDEO_PALETTE_JPEG,jpegsize,PICTURE,NULL);	
+									VIDEO_PALETTE_JPEG,jpegsize,PICTURE,NULL);
 								break;
 							case SDLK_w:
 							messcallback->updocontrast =2;
@@ -869,7 +869,7 @@ return 0;
 
 int spcaPlay (char* inputfile, int width, int height){
 
-	/* Timing value used for statistic */	
+	/* Timing value used for statistic */
 	Uint32 synctime = 0;
 	Uint32 intime = 0;
 	Uint32 pictime = 0;
@@ -886,7 +886,7 @@ int spcaPlay (char* inputfile, int width, int height){
 	/**********************************/
 	/*        avi parametres          */
 	avi_t *out_fd;
-	char *compressor; 
+	char *compressor;
 	double framerate;
 	long audiorate;
 	int audiobits;
@@ -907,9 +907,9 @@ int spcaPlay (char* inputfile, int width, int height){
 	int run = 1;
 	int quit = 1;
 	int initAudio = 0; //flag start audio
-	int videocomp = 0; //is compression dsph 
+	int videocomp = 0; //is compression dsph
 	int frame_size = 0;
-	int len = 0; 
+	int len = 0;
 	int fullsize = 0;
 	/*********************************/
 	/* data for SDL_audioin && SDL_audio */
@@ -917,8 +917,8 @@ int spcaPlay (char* inputfile, int width, int height){
   	SDL_AudioSpec expect;
   	struct Rbuffer RingBuffer;
   	int retry = 100;
-  	
-  	int err = 0; 	
+
+  	int err = 0;
 	int bytes_per_read =0;
 	int audioout = 0;
 	int audiolength = 0;
@@ -937,7 +937,7 @@ int spcaPlay (char* inputfile, int width, int height){
 		exit (-1);
 	}
 	//bitperpix = GetVideoBpp();
-	
+
 	/* Clean up on exit */
 	atexit (SDL_Quit);
 
@@ -1022,7 +1022,7 @@ int spcaPlay (char* inputfile, int width, int height){
 		synctime = 1000 / framerate;
 		printf ("Frame time %d ms\n", synctime);
 		if (AVI_audio_channels (out_fd) == 1) {
-			
+
 			expect.format=AUDIO_FORMAT;
   			expect.freq=audiorate;
   			expect.callback=callback_play;
@@ -1045,7 +1045,7 @@ int spcaPlay (char* inputfile, int width, int height){
 				audioout = 1;
 		}
 		i = 0;
-	
+
 		do {
 			if (run) {
 				intime = SDL_GetTicks ();
@@ -1055,12 +1055,12 @@ int spcaPlay (char* inputfile, int width, int height){
 					   audioout, 1,videocomp);
 
 				//printf("readframe %d audiolength %d position errors %d \n",i,audiolength,err);
-				
+
 				if (initAudio ){
 					initAudio = 0;
 					SDL_PauseAudio(0); // start play
 				}
-				
+
 refresh_screen ( jpegData, p, format, image_width,image_height,owidth,oheight,jpegSize,0);
 				SDL_Flip (pscreen);	//switch the buffer and update screen
 				pictime = SDL_GetTicks () - intime;
@@ -1076,26 +1076,26 @@ refresh_screen ( jpegData, p, format, image_width,image_height,owidth,oheight,jp
 				switch (sdlevent.type) {
 					case SDL_KEYDOWN:
 						switch (sdlevent.key.keysym.sym) {
-							
+
 							case SDLK_DOWN:
 								SDL_PauseAudio(1); // stop play
 								run = 0;
 								break;
-							
+
 							case SDLK_s:
 								if (run == 0) {
 									getJpegPicture(jpegData,image_width,image_height,
-										format,jpegSize,PICTURE,NULL);	
+										format,jpegSize,PICTURE,NULL);
 								}
 								break;
 							case SDLK_SPACE:
 							if (fullsize ==
 								    0) {
-									pscreen = SDL_SetVideoMode (owidth, oheight, testbpp, 
+									pscreen = SDL_SetVideoMode (owidth, oheight, testbpp,
 									SDL_DOUBLEBUF | SDL_FULLSCREEN | SDL_SWSURFACE);
 									fullsize = 1;
 								} else {
-									pscreen = SDL_SetVideoMode (owidth, oheight, testbpp, 
+									pscreen = SDL_SetVideoMode (owidth, oheight, testbpp,
 									SDL_DOUBLEBUF | SDL_SWSURFACE);
 									fullsize = 0;
 								}
@@ -1104,11 +1104,11 @@ refresh_screen ( jpegData, p, format, image_width,image_height,owidth,oheight,jp
 									printf ("Couldn't set %d*%dx%d video mode: %s\n", owidth, oheight, testbpp, SDL_GetError ());
 									exit (1);
 								}
-								
+
 								SDL_ShowCursor
 									(0);
-								
-							
+
+
 								break;
 							default:
 								printf ("\nStop asked\n");
@@ -1119,7 +1119,7 @@ refresh_screen ( jpegData, p, format, image_width,image_height,owidth,oheight,jp
 					case SDL_QUIT:
 						quit = 0;
 						break;
-				} 
+				}
 			} //end if poll
 			break;
 			case 0:
@@ -1190,11 +1190,11 @@ refresh_screen ( jpegData, p, format, image_width,image_height,owidth,oheight,jp
 							case SDLK_s:
 								if (run == 0) {
 									getJpegPicture(jpegData,image_width,image_height,
-										format,jpegSize,PICTURE,NULL);	
+										format,jpegSize,PICTURE,NULL);
 								}
 								break;
 							case SDLK_SPACE:
-							
+
 								if (fullsize ==
 								    0) {
 									pscreen = SDL_SetVideoMode (owidth, oheight, testbpp, SDL_DOUBLEBUF | SDL_FULLSCREEN | SDL_SWSURFACE);
@@ -1208,7 +1208,7 @@ refresh_screen ( jpegData, p, format, image_width,image_height,owidth,oheight,jp
 									printf ("Couldn't set %d*%dx%d video mode: %s\n", owidth, oheight, testbpp, SDL_GetError ());
 									exit (1);
 								}
-								
+
 								SDL_ShowCursor(0);
 								refresh_screen(jpegData,
 										 p,
@@ -1230,7 +1230,7 @@ refresh_screen ( jpegData, p, format, image_width,image_height,owidth,oheight,jp
 					case SDL_QUIT:
 						quit = 0;
 						break;
-				} 
+				}
 			} //end if wait
 			break;
 			} //end switch run
@@ -1239,20 +1239,20 @@ refresh_screen ( jpegData, p, format, image_width,image_height,owidth,oheight,jp
 		free (jpegData);
 		//close_libjpeg_decoder ();
 		if (audioout) {
-		
+
 		while ((RingBuffer.ptread != RingBuffer.ptwrite) && retry--){
  			SDL_Delay(10);
   			//fprintf(stderr,"Waiting .. stop the player %d\n",retry);
  			}
 			 SDL_CloseAudio(); // stop play
-			
+
 			audioout = 0;
-		
+
 		}
 		AVI_close (out_fd);
 		SDL_Quit ();
 return 0;
-} 
+}
 static void spcaPrintParam (int fd,struct video_param *videoparam);
 
 static void spcaSetAutoExpo(int fd, struct video_param * videoparam)
@@ -1263,11 +1263,11 @@ static void spcaSetAutoExpo(int fd, struct video_param * videoparam)
 		printf ("autobright error !!\n");
 	} else
 		spcaPrintParam (fd,videoparam);
-	
+
 }
 
 static void spcaSetLightFrequency(int fd, struct video_param * videoparam, int light_freq)
-{			       
+{
 	videoparam->chg_para = CHGLIGHTFREQ;
 	videoparam->light_freq = light_freq;
 	if(ioctl(fd,SPCASVIDIOPARAM, videoparam) == -1){
@@ -1277,7 +1277,7 @@ static void spcaSetLightFrequency(int fd, struct video_param * videoparam, int l
 }
 
 static int spcaSwitchLightFrequency(int fd, struct video_param * videoparam)
-{			       
+{
 	int light_freq;
         if(ioctl(fd,SPCAGVIDIOPARAM, videoparam) == -1){
 		printf ("wrong spca5xx device\n");
@@ -1285,9 +1285,9 @@ static int spcaSwitchLightFrequency(int fd, struct video_param * videoparam)
 	   light_freq = videoparam->light_freq;
 	   if(light_freq == 50)
 	      light_freq +=10;
-	   else if(light_freq == 60) 
+	   else if(light_freq == 60)
               light_freq = 0;
-	   else if(light_freq == 0)   
+	   else if(light_freq == 0)
 	      light_freq = 50;
 	   if(light_freq)
 	    printf ("Current light frequency filter: %d Hz\n", light_freq);
@@ -1326,7 +1326,7 @@ static void spcaPrintParam (int fd, struct video_param *videoparam)
 {
 	if(ioctl(fd,SPCAGVIDIOPARAM, videoparam) == -1){
 		printf ("wrong spca5xx device\n");
-	} else 
+	} else
 		printf("quality %d autoexpo %d Timeframe %d lightfreq %d\n",
 			 videoparam->quality,videoparam->autobright,videoparam->time_interval, videoparam->light_freq);
 }
@@ -1356,8 +1356,8 @@ static void timeDown(int fd, struct video_param *videoparam)
 }
 int spcaGrab (char *outputfile,char fourcc[4] , const char *videodevice, int image_width,int image_height, int format, int owidth, int oheight,
 	int grabMethod,int videoOn,int audioout,int videocomp,int autobright,int statOn,int decodeOn) {
-	
-	
+
+
 	/* Timing value used for statistic */
 	Uint32 total_decode_time = 0;
 	Uint32 time = 0;
@@ -1403,16 +1403,16 @@ int spcaGrab (char *outputfile,char fourcc[4] , const char *videodevice, int ima
 	/*          Starting Flags       */
 	int run = 1;
 	int quit = 1;
-	
-	
+
+
 	int initAudio = 0; //flag start audio
 	int method = 1;
 	int streamid ;
 	int isVideoChannel = 1;
 	int frame_size = 0;
-	int len = 0; 
-	
-	
+	int len = 0;
+
+
 	/*********************************/
 	/* data for SDL_audioin && SDL_audio */
 	SDL_AudioSpec spec, result;
@@ -1421,7 +1421,7 @@ int spcaGrab (char *outputfile,char fourcc[4] , const char *videodevice, int ima
   	int retry = 100;
   	int ptread ;
 	int ptwrite ;
-  	int err = 0; 	
+  	int err = 0;
 	int bytes_per_read =0;
 	int testbpp=16;
 	/*********************************/
@@ -1431,23 +1431,23 @@ int spcaGrab (char *outputfile,char fourcc[4] , const char *videodevice, int ima
 	/*********************************/
 	RingBuffer.ptread =0;
   	RingBuffer.ptwrite =0;
-		/* spcaview grabber */	
+		/* spcaview grabber */
 		printf ("Initializing SDL.\n");
-	
+
 	/* Initialize defaults, Video and Audio */
 	if ((SDL_Init (SDL_INIT_VIDEO | SDL_INIT_TIMER) == -1)) {
 		printf ("Could not initialize SDL: %s.\n", SDL_GetError ());
 		exit (-1);
 	}
-	
-	
+
+
 	/* Clean up on exit */
 	atexit (SDL_Quit);
 	if(!owidth || !oheight){
 		owidth	= image_width;
 		oheight	= image_height;
-		}	
-	printf ("SDL initialized.\n");	
+		}
+	printf ("SDL initialized.\n");
 		/* validate parameters */
 		printf ("bpp %d format %d\n", bpp, format);
 		if(!videoOn) {
@@ -1466,7 +1466,7 @@ int spcaGrab (char *outputfile,char fourcc[4] , const char *videodevice, int ima
 		}
 		printf ("Using video device %s.\n", videodevice);
 		printf ("Initializing v4l.\n");
-		
+
 		//v4l init
 		if ((fd = open (videodevice, O_RDWR)) == -1) {
 			perror ("ERROR opening V4L interface \n");
@@ -1477,9 +1477,9 @@ int spcaGrab (char *outputfile,char fourcc[4] , const char *videodevice, int ima
 			printf ("wrong device\n");
 			exit (1);
 		}
-		
+
 		printf("Camera found: %s \n",videocap.name);
-		
+
 		if (ioctl (fd, VIDIOCGCHAN, &videochan) == -1) {
 			printf ("Hmm did not support Video_channel\n");
 			isVideoChannel = 0;
@@ -1498,15 +1498,15 @@ int spcaGrab (char *outputfile,char fourcc[4] , const char *videodevice, int ima
 			}
 			printf("Bridge found: %s \n",videochan.name);
 			streamid = getStreamId (videochan.name);
-		
+
 			if (streamid >= 0){
 				printf("StreamId: %s Camera\n",Plist[streamid].name);
 				/* look a spca5xx webcam try to set the video param struct */
 				spcaPrintParam (fd,&videoparam);
 			} else {
 				printf("StreamId: %d Unknow Camera\n",streamid);
-			} 
-			/* test jpeg capability if not and jpeg ask without raw data 
+			}
+			/* test jpeg capability if not and jpeg ask without raw data
 			set default format to YUVP */
 			if ((format == VIDEO_PALETTE_RAW_JPEG || format == VIDEO_PALETTE_JPEG )&& streamid != JPEG && videoOn) {
 				printf ("Camera unable to stream in JPEG mode switch to YUV420P\n");
@@ -1525,7 +1525,7 @@ int spcaGrab (char *outputfile,char fourcc[4] , const char *videodevice, int ima
 				perror (" init VIDIOCGMBUF FAILED\n");
 			}
 			printf ("VIDIOCGMBUF size %d  frames %d  offets[0]=%d offsets[1]=%d\n", videombuf.size, videombuf.frames, videombuf.offsets[0], videombuf.offsets[1]);
-			
+
 			pFramebuffer =
 				(unsigned char *) mmap (0, videombuf.size,
 							PROT_READ | PROT_WRITE,
@@ -1541,7 +1541,7 @@ int spcaGrab (char *outputfile,char fourcc[4] , const char *videodevice, int ima
 				}
 			}
 			vmmap.frame = 0;
-			/* Compute the estimate frame size we expect that jpeg compress factor 10 
+			/* Compute the estimate frame size we expect that jpeg compress factor 10
 			if ((format == VIDEO_PALETTE_RAW_JPEG) && videoOn)
 				frame_size =
 					videombuf.size / (10 *
@@ -1560,7 +1560,7 @@ int spcaGrab (char *outputfile,char fourcc[4] , const char *videodevice, int ima
 				perror ("VIDIOCSWIN failed \n");
 			printf ("VIDIOCGWIN height %d  width %d \n",
 				videowin.height, videowin.width);
-			
+
 		}
 		switch (format) {
 				case VIDEO_PALETTE_JPEG:{
@@ -1598,7 +1598,7 @@ int spcaGrab (char *outputfile,char fourcc[4] , const char *videodevice, int ima
 		printf("brightnes=%d hue=%d color=%d contrast=%d whiteness=%d \n" ,
 		 videopict.brightness, videopict.hue, videopict.colour, videopict.contrast, videopict.whiteness);
 		printf("depth=%d palette=%d\n", videopict.depth, videopict.palette);
-		
+
 		videopict.palette = format;
 		videopict.depth = bpp * 8;
 		//videopict.brightness = INIT_BRIGHT;
@@ -1607,7 +1607,7 @@ int spcaGrab (char *outputfile,char fourcc[4] , const char *videodevice, int ima
 
 
 		/*
-		 * Initialize the display 
+		 * Initialize the display
 		 */
 if ( decodeOn && videoOn )
 			{	/* Display data */
@@ -1669,13 +1669,13 @@ SDL_WM_SetCaption (videocap.name, NULL);
 			AVI_set_audio (out_fd, spec.channels, spec.freq,
 					       16, WAVE_AUDIO_PCM);
 			//printf ("audio record setting channel %d frequency %d format %d",spec.channels, spec.freq, WAVE_AUDIO_PCM);
-			
-			// SDL_PauseAudioIn(0); // start record		
+
+			// SDL_PauseAudioIn(0); // start record
 			initAudio = 1;
 			}
 		} else
 		mypict.mode = PICTURE;
-		
+
 
 		/* Allocate tmp buffer for one frame. */
 
@@ -1693,13 +1693,13 @@ SDL_WM_SetCaption (videocap.name, NULL);
 			fprintf(stderr,"thread shoot Create error!\n");
 			exit(-1);
 		}
-	
+
 	 	if (interval && videoOn){
 			// set_timer(interval);
 			SDL_SetTimer((Uint32) interval,callback_timer);
 		 }
 		i = 0;
-		
+
 		while (run && Oneshoot) {
 			memset(tmp,0x00,frame_size);
 			intime = SDL_GetTicks ();
@@ -1712,7 +1712,7 @@ SDL_WM_SetCaption (videocap.name, NULL);
 				}
 			/* compute bytes sound */
 			if (pictime < 100) {
-				
+
 				bytes_per_read =
 					((AUDIO_SAMPLERATE / 1000) * 2 * pictime);
 			}
@@ -1734,7 +1734,7 @@ SDL_WM_SetCaption (videocap.name, NULL);
 				}
 				vmmap.frame =
 					(vmmap.frame + 1) % videombuf.frames;
-				
+
 			} else {
 				/* read method */
 				len = read (fd, tmp, frame_size);
@@ -1746,7 +1746,7 @@ SDL_WM_SetCaption (videocap.name, NULL);
 			// printf("get Picture condition \n");
 				wstatus = pthread_mutex_lock (&mypict.mutex);
     				if (wstatus != 0) {fprintf(stderr,"Lock error!\n"); exit(-1);}
-     				memcpy (mypict.data,tmp,frame_size);	
+     				memcpy (mypict.data,tmp,frame_size);
 				//printf("COND OK !!\n");
        				wstatus = pthread_cond_signal (&mypict.cond);
     				if (wstatus != 0) {fprintf(stderr,"Signal error!\n"); exit(-1);}
@@ -1767,14 +1767,14 @@ SDL_WM_SetCaption (videocap.name, NULL);
 						}
 						break;
 					case VIDEO_PALETTE_RAW_JPEG:{
-							
+
 								if (AVI_write_frame
 							    			(out_fd,
 							     			(unsigned char *)
 							     			tmp,
 							    			 frame_size) < 0)
 									printf ("write error on avi out \n");
-							
+
 						}
 						break;
 					case VIDEO_PALETTE_YUV420P:{
@@ -1831,7 +1831,7 @@ SDL_WM_SetCaption (videocap.name, NULL);
 						    (out_fd, (char *) RingBuffer.buffer+ptread,
 						     ptwrite-ptread) < 0)
 							printf (" write AVI error \n");
-						 RingBuffer.ptread =  (RingBuffer.ptread + (ptwrite-ptread))%MAXBUFFERSIZE;	
+						 RingBuffer.ptread =  (RingBuffer.ptread + (ptwrite-ptread))%MAXBUFFERSIZE;
 					} else if (ptwrite < ptread ){
 					if (AVI_write_audio
 						    (out_fd, (char *) RingBuffer.buffer+ptread,
@@ -1841,33 +1841,33 @@ SDL_WM_SetCaption (videocap.name, NULL);
 						    (out_fd, (char *) RingBuffer.buffer,
 						     ptwrite) < 0)
 							printf (" write AVI error \n");
-					 RingBuffer.ptread =  (RingBuffer.ptread + ptwrite+(MAXBUFFERSIZE-ptread))%MAXBUFFERSIZE;		
+					 RingBuffer.ptread =  (RingBuffer.ptread + ptwrite+(MAXBUFFERSIZE-ptread))%MAXBUFFERSIZE;
 					}
-				
+
 				}
-				
+
 			}
 
 			compresstime =SDL_GetTicks ();
 
-			
-			
+
+
 			if ( decodeOn && videoOn && (i > 10))
 			{	/* Display data */
 				p = pp = pscreen->pixels;
-				
+
 			  refresh_screen ( tmp, p, format,
 			  image_width,image_height,owidth,oheight,image_width*image_height*bpp,autobright);
 			  if (autobright)
 			  	adjust_bright(&videopict, fd);
 			  decodetime = SDL_GetTicks ();
 
-			SDL_UpdateRect (pscreen, 0, 0, 0, 0);	//update the entire screen	
-			
+			SDL_UpdateRect (pscreen, 0, 0, 0, 0);	//update the entire screen
+
 			} else {
 			decodetime = SDL_GetTicks ();
 			}
-			
+
 			/* increment the real frame count and update statistics */
 			framecount++;
 
@@ -1877,10 +1877,10 @@ SDL_WM_SetCaption (videocap.name, NULL);
 			if (!autobright && statOn){
 // \r
 				printf ("frames:%04d pict:%03dms synch:%03dms write/comp:%03dms decode:%03dms display:%03dms \n",
-				 framecount, pictime, synctime-intime, compresstime-synctime, decodetime-compresstime,SDL_GetTicks ()-decodetime); 
-			fflush (stdout);	 
+				 framecount, pictime, synctime-intime, compresstime-synctime, decodetime-compresstime,SDL_GetTicks ()-decodetime);
+			fflush (stdout);
 			}
-			
+
 			if (SDL_PollEvent (&sdlevent) == 1) {
 				switch (sdlevent.type) {
 					case SDL_KEYDOWN:
@@ -1957,7 +1957,7 @@ SDL_WM_SetCaption (videocap.name, NULL);
 								run = 0;
 								break;
 							default:
-								
+
 								break;
 						}
 						break;
@@ -1968,12 +1968,12 @@ SDL_WM_SetCaption (videocap.name, NULL);
 			}
 
 		}
-		
+
 			if (audioout) {
-			
-				SDL_CloseAudioIn(); //stop record 
+
+				SDL_CloseAudioIn(); //stop record
 				printf ("free sound buffer\n");
-			
+
 			}
 			if (interval && decodeOn && videoOn){
 			// set_timer(interval);
@@ -2003,15 +2003,15 @@ SDL_WM_SetCaption (videocap.name, NULL);
 			AVI_close (out_fd);
 			printf ("close avi\n");
 			if (audioout) {
-			
+
 				 SDL_QuitAudioIn();
 				printf ("free sound buffer\n");
-			
+
 			}
 			free (jpegData);
 			free(dpshDest);
 		}
-		
+
 		pthread_cancel(waitandshoot_id);
 		pthread_join (waitandshoot_id,NULL);
 		pthread_cond_destroy(&mypict.cond);
@@ -2019,13 +2019,13 @@ SDL_WM_SetCaption (videocap.name, NULL);
 		if (mypict.data)
 			free(mypict.data);
 		printf ("Destroy Picture thread ...\n");
-		
+
 		/* Shutdown all subsystems */
 		free (tmp);
 		//close_libjpeg_decoder ();
 		printf ("Quiting....\n");
 		SDL_Quit ();
-return 0;	 
+return 0;
 }
 
 Uint32 GetVideoBpp (void)
@@ -2049,7 +2049,7 @@ static int
 		videopict->brightness, videopict->hue,
 		videopict->colour, videopict->contrast, videopict->whiteness);
 		printf("depth=%d palette=%d \n",videopict->depth, videopict->palette);
-	  
+
 	return 0;
 }
 
@@ -2095,13 +2095,13 @@ static int
 		if (updown) {
 			/* upstream */
 			/* read the audio Byte until no Byte */
-			
+
 					if (ptwrite + audiosize < MAXBUFFERSIZE) {
 
 					if (AVI_read_audio
 						    (out_fd, (char *) RingBuffer->buffer+ptwrite,
 						     audiosize) < 0)
-							 printf (" Read AVIchunck error \n");	
+							 printf (" Read AVIchunck error \n");
 					} else {
 					//printf ("part1 %d, part2 %d \n",MAXBUFFERSIZE-ptwrite,audiosize -( MAXBUFFERSIZE-ptwrite));
 
@@ -2113,15 +2113,15 @@ static int
 						    (out_fd, (char *) RingBuffer->buffer,
 						     audiosize -( MAXBUFFERSIZE-ptwrite)) < 0)
 							 printf (" Read AVIpart2 error \n");
-		
+
 					}
-			SDL_LockAudio();	
+			SDL_LockAudio();
 				RingBuffer->ptwrite =  (RingBuffer->ptwrite + audiosize)%MAXBUFFERSIZE;
 			SDL_UnlockAudio();
-			
+
 			*audiolen -= audiosize;
-			
-			
+
+
 
 		} else {
 			/* down stream */
@@ -2141,7 +2141,7 @@ return delta;
 }
 
 #define ADDRESSE(x,y,w) (((y)*(w))+(x))
-void resize16 (unsigned char *dst,unsigned char *src, int Wd,int Hd,int Ws,int Hs) 
+void resize16 (unsigned char *dst,unsigned char *src, int Wd,int Hd,int Ws,int Hs)
 {
 	int rx,ry;
 	int xscale,yscale;
@@ -2149,7 +2149,7 @@ void resize16 (unsigned char *dst,unsigned char *src, int Wd,int Hd,int Ws,int H
 	Myrgb24 pixel;
 	Myrgb16 *output =(Myrgb16*) dst ;
 	Myrgb24 *input = (Myrgb24*) src ;
-	
+
 	xscale =  (Ws << 16)/Wd;
 	yscale = (Hs << 16)/ Hd;
 	for (y = 0; y < Hd; y++){
@@ -2162,11 +2162,11 @@ void resize16 (unsigned char *dst,unsigned char *src, int Wd,int Hd,int Ws,int H
 		 output++ ;
 		}
 	}
-	
-	
-	
+
+
+
 }
-void resize (unsigned char *dst,unsigned char *src, int Wd,int Hd,int Ws,int Hs) 
+void resize (unsigned char *dst,unsigned char *src, int Wd,int Hd,int Ws,int Hs)
 {
 	int rx,ry;
 	int xscale,yscale;
@@ -2174,7 +2174,7 @@ void resize (unsigned char *dst,unsigned char *src, int Wd,int Hd,int Ws,int Hs)
 	Myrgb24 pixel;
 	Myrgb24 *output =(Myrgb24*) dst ;
 	Myrgb24 *input = (Myrgb24*) src ;
-	
+
 	xscale =  (Ws << 16)/Wd;
 	yscale = (Hs << 16)/ Hd;
 	for (y = 0; y < Hd; y++){
@@ -2184,9 +2184,9 @@ void resize (unsigned char *dst,unsigned char *src, int Wd,int Hd,int Ws,int Hs)
 		 memcpy(output++,&input[ADDRESSE((int)rx,(int)ry,Ws)],sizeof(Myrgb24));
 		}
 	}
-	
-	
-	
+
+
+
 }
 /* refresh_screen input all palette to RGB24 -> RGB565 */
 static void
@@ -2201,7 +2201,7 @@ refresh_screen (unsigned char *src, unsigned char *pict, int format, int width,
 unsigned char *dst = NULL;
 /* in case VIDEO_PALETTE_RAW_JPEG nothing todo */
 	if( format == VIDEO_PALETTE_RAW_JPEG)
-		return ; 
+		return ;
 	/* for some strange reason tiny_jpegdecode need 1 macroblok line more ?? */
 	dst = malloc (width*(height+8)*3);
 	switch (format) {
@@ -2251,13 +2251,13 @@ if (autobright)
 	totmean = get_pic_mean( width, height, dst, 0, 0, 0,
 				  width, height );
 /* rezize16 input rgb24 output rgb565 */
-resize16 (pict,dst,owidth,oheight,width,height) ;	
+resize16 (pict,dst,owidth,oheight,width,height) ;
 	free(dst);
 }
 #if 0
 static int
  isSpcaChip (const char *BridgeName)
-{ 
+{
 	int i = -1;
 	int size =0;
 	//size = strlen(BridgeName)-1;
@@ -2271,12 +2271,12 @@ static int
 		 break;
 		}
 	}
-	
+
 return i;
 }
 static int
  getStreamId (const char * BridgeName)
-{ 
+{
 	int i = -1;
 	int match = -1;
 /* return Stream_id otherwhise -1 */
@@ -2286,7 +2286,7 @@ static int
 	 }
 	switch (match) {
 		case BRIDGE_SPCA505:
-		case BRIDGE_SPCA506: 
+		case BRIDGE_SPCA506:
 			i= YYUV;
 			break;
 		case BRIDGE_SPCA501:
@@ -2318,9 +2318,9 @@ static int
 			i = -1;
 			 printf("Unable to find a StreamId !!\n");
 			break;
-	
+
 	}
-return i;	 
+return i;
 }
  #endif
  static int
@@ -2329,9 +2329,9 @@ isSpcaChip (const char *BridgeName)
   int i = -1;
   int find = -1;
   int size = 0;
-  
+
   /* Spca506 return more with channel video, cut it */
-  
+
   /* return Bridge otherwhise -1 */
   for (i = 0; i < MAX_BRIDGE -1; i++)
     {
@@ -2382,7 +2382,7 @@ getStreamId (const char *BridgeName)
     case BRIDGE_SN9CXXX:
     case BRIDGE_MR97311:
     case BRIDGE_VC0323:
-    case BRIDGE_PAC7311:   
+    case BRIDGE_PAC7311:
       i = JPEG;
       break;
     case BRIDGE_ETOMS:
@@ -2414,7 +2414,7 @@ static int
 	printf ("Cannot Probe Size !! maybe not an Spca5xx Camera\n");
 	return -1;
 	}
-	
+
 	for (i=0; (unsigned int)(GET_EXT_MODES(bridge)[i][0]);i++){
 		intwidth = GET_EXT_MODES(bridge)[i][0];
 		intheight = GET_EXT_MODES(bridge)[i][1];
@@ -2424,7 +2424,7 @@ static int
 		} else {
 			match = 0;
 		}
-		
+
 		printf("Available Resolutions width %d  heigth %d %s %c\n",
 			intwidth,intheight,(intformat)?"decoded":"native",
 			(match)?'*':' ');
@@ -2449,7 +2449,7 @@ static int
  */
 static int
  get_pic_mean( int width, int height, const unsigned char *buffer,
-			  int is_rgb,int startx, int starty, int endx, 
+			  int is_rgb,int startx, int starty, int endx,
 			  int endy )
 {
   double rtotal = 0, gtotal = 0, btotal = 0;
@@ -2457,7 +2457,7 @@ static int
   double bwtotal = 0, area;
   int rmean, gmean, bmean;
   const unsigned char *cp;
-    
+
   minrow = starty;
   mincol = startx;
   maxrow = endy;
@@ -2496,14 +2496,14 @@ static int
  adjust_bright( struct video_picture *videopict, int fd)
 {
   int newbright;
-  
+
   newbright=videopict->brightness;
-  if( totmean < BRIGHTMEAN - BRIGHTWINDOW|| 
+  if( totmean < BRIGHTMEAN - BRIGHTWINDOW||
       totmean > BRIGHTMEAN + BRIGHTWINDOW ){
     newbright += (BRIGHTMEAN-totmean)*SPRING_CONSTANT;
     newbright = clip_to(newbright, V4L_BRIGHT_MIN, V4L_BRIGHT_MAX);
   }
-  
+
   printf("totmean:%03d newbright:%05d\r",totmean,newbright);
   /* Slight adjustment */
   videopict->brightness=newbright;
